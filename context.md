@@ -9,8 +9,8 @@ Only public-domain or licensed films are hosted. No pirated streams.
 ## Stack
 
 - Web: Next.js 15 (App Router, TS) on Vercel. `/api/*` is rewritten to the Go API, so the admin cookie is first-party.
-- API: Go 1.26 (net/http, pgx) on Render or Fly.
-- DB: Postgres on Neon or Supabase. Schema is created automatically on start.
+- API: Go 1.26 (net/http, pgx) on Vercel (Go framework preset, `api/vercel.json`); `api/Dockerfile` for container hosts.
+- DB: Postgres on Supabase (Session pooler, port 5432). Schema is created automatically on start.
 - Video storage: Cloudflare R2, public bucket, S3 API, zero egress fees.
 - Metadata: TMDB API (free for non-commercial use, attribution required). Adding ads means commercial use and needs a TMDB licence.
 - Encoding: worker with ffmpeg, run on Tony's PC. Produces HLS 360/720/1080p (no upscaling). The player uses hls.js.
@@ -71,7 +71,7 @@ Admin (cookie auth + Origin check):
   - Go unit tests, ffmpeg encode tests, DB tests, admin-auth tests.
   - Full end-to-end run with a fake TMDB and an S3 mock (moto): login → create → upload → encode → publish → subtitles → public pages render.
   - `next build` and `tsc` pass.
-- Not done yet: deployment with real TMDB, R2 and Neon accounts.
+- Not done yet: deployment with real TMDB, R2 and Supabase accounts.
 - TODO: replace the "Powered by TMDB" text with an approved TMDB logo.
 
 ## Design
@@ -81,8 +81,8 @@ Look: dark background #0E0E10, amber accent #E8A33D, fonts Bricolage Grotesque (
 
 ## Next steps
 
-1. Create accounts: TMDB token, R2 bucket (public access + CORS from README), Neon DB.
+1. Create accounts: TMDB token, R2 bucket (public access + CORS from README), Supabase DB (Session pooler URL).
 2. Run `go run ./cmd/admin -email ...` and add the TOTP secret to an authenticator app.
-3. Deploy the API to Render (api/Dockerfile) and the web to Vercel (root: web).
+3. Deploy the API and the web as two Vercel projects (roots: `api` and `web`). See DEPLOY.md.
 4. Run the worker locally and upload the first public-domain film (e.g. from archive.org).
 5. Possible next features: real view counts for a Top row, R2 multipart upload for files over 5 GB, Redis-backed rate limiter, a Vietnamese UI.

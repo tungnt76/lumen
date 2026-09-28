@@ -7,7 +7,7 @@ Netflix-style catalog for **public-domain or licensed films**, built on free tie
 - Films not hosted here still get a page with a trailer and **legal where-to-watch** links (TMDB watch providers, data by JustWatch).
 
 ```
-Browser ──> Next.js (Vercel) ──/api rewrite──> Go API (Render/Fly) ──> Postgres (Neon)
+Browser ──> Next.js (Vercel) ──/api rewrite──> Go API (Vercel) ──> Postgres (Supabase)
    │                                               └──> TMDB (metadata, cached)
    └── HLS video + subtitles <── Cloudflare R2 (public bucket, no egress fees)
                                      ▲
@@ -36,7 +36,7 @@ Admin browser ── presigned PUT ──────┘   Worker (your PC, ffmp
        "MaxAgeSeconds":3600}]
      ```
    - R2 → Manage API tokens → *Object Read & Write*, scoped to this bucket.
-3. **Neon** (or Supabase): create a Postgres database, copy the connection string. Tables are created automatically on start.
+3. **Supabase** (or Neon): create a Postgres database and copy the **Session pooler** connection string (port 5432; the transaction pooler breaks pgx prepared statements). Tables are created automatically on start.
 
 ## 2. Run locally
 
@@ -70,9 +70,9 @@ Open `http://localhost:3000/studio`, sign in, upload a short test clip, wait for
 
 Step-by-step go-live checklist (Vietnamese): [DEPLOY.md](DEPLOY.md).
 
-**API → Render** (or Fly.io): new Web Service from this repo, root `api`, Dockerfile `api/Dockerfile`. Set the env vars from `.env.example` with `SITE_ORIGIN=https://YOUR-SITE.vercel.app` and `COOKIE_SECURE=true`. Free instances may sleep when idle, so the first request after a pause is slow.
+**API → Vercel**: a second Vercel project with root directory `api`; the Go framework preset (`api/vercel.json`) builds `cmd/api`. Set the env vars from `.env.example` with `SITE_ORIGIN=https://YOUR-SITE.vercel.app` and `COOKIE_SECURE=true`. A daily Vercel cron hits `/api/browse` so a free Supabase project isn't paused. `api/Dockerfile` still works for Render or any container host.
 
-**Web → Vercel**: import the repo, root directory `web`, env `API_URL=https://your-api.onrender.com`. The `/api/*` rewrite is set at build time, so redeploy after changing `API_URL`.
+**Web → Vercel**: import the repo, root directory `web`, env `API_URL=https://your-api.vercel.app`. The `/api/*` rewrite is set at build time, so redeploy after changing `API_URL`.
 
 **Worker**: run it on your own computer (`go run ./cmd/worker`) or `docker build -f Dockerfile.worker`. It only needs to be on while there are uploads to encode; queued films wait for it.
 

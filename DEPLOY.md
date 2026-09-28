@@ -1,11 +1,12 @@
 # Checklist go-live (free tier)
 
 ```
-Trình duyệt ──> Vercel (Next.js) ──/api──> Render (Go API) ──> Neon (Postgres)
+Trình duyệt ──> Vercel project "web" (Next.js) ──/api──> Vercel project "api" (Go) ──> Supabase (Postgres)
      └── video HLS <── Cloudflare R2 (media.<domain>) <── worker trên máy bạn (ffmpeg)
 ```
 
-Chọn **một region gần Việt Nam cho tất cả**: Singapore (Neon `aws-ap-southeast-1`, Render `Singapore`, Vercel function region `sin1`).
+Tất cả chạy trên gói free, **không cần thẻ**. Đặt function region của cả 2 project Vercel **cùng region với Supabase**:
+Tokyo (`ap-northeast-1`) → `hnd1`, Singapore (`ap-southeast-1`) → `sin1`.
 Ghi lại mọi giá trị bí mật vào trình quản lý mật khẩu, **không** commit.
 
 ## 0. Chuẩn bị code
@@ -26,14 +27,21 @@ Ghi lại mọi giá trị bí mật vào trình quản lý mật khẩu, **khô
 
 - [ ] themoviedb.org → Settings → API → copy **API Read Access Token** → `TMDB_TOKEN`.
 
-## 3. Database: Neon
+## 3. Database: Supabase
 
-- [ ] Tạo project, region **Singapore**, Postgres 16.
-- [ ] Copy connection string **Direct** (bỏ tick *Connection pooling*), giữ `?sslmode=require` → `DATABASE_URL`.
-      Bảng tự tạo khi API khởi động lần đầu.
+- [ ] Chọn project cho production:
+      - **Khuyến nghị:** tạo project mới cho production (cùng region Tokyo hoặc Singapore), tách khỏi DB dev.
+        Free cho phép 2 project đang chạy.
+      - Hoặc dùng project hiện tại (Tokyo `ap-northeast-1`): chạy được, nhưng dev và production dùng chung dữ liệu.
+- [ ] Connect → **Session pooler** (host `aws-0-<region>.pooler.supabase.com`, **port 5432**) → `DATABASE_URL`.
+      - Không dùng *Transaction pooler* (port 6543): không hỗ trợ prepared statements mà pgx dùng.
+      - Không dùng *Direct connection* (`db.<ref>.supabase.co`): chỉ có IPv6, Vercel Functions không kết nối được.
+      - Bảng tự tạo khi API khởi động lần đầu.
 - [ ] Tạo tài khoản admin từ máy bạn (nhập mật khẩu khi được hỏi):
-      `cd api && DATABASE_URL='<neon url>' go run ./cmd/admin -email you@example.com`
+      `cd api && DATABASE_URL='<supabase url>' go run ./cmd/admin -email you@example.com`
 - [ ] **Không** chạy `make seed` lên DB production: phim seed không có video.
+      Nếu dùng lại project hiện tại mà đã seed: chạy `make seed-remove` trước khi mở site.
+- [ ] Free: 500 MB, project **bị tạm dừng nếu 7 ngày ít truy vấn** (xem bước 8).
 
 ## 4. Video: Cloudflare R2
 
@@ -51,15 +59,18 @@ Ghi lại mọi giá trị bí mật vào trình quản lý mật khẩu, **khô
 - [ ] R2 → Manage API tokens → *Object Read & Write*, chỉ cho bucket này → `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`.
 - [ ] Free: 10 GB. Một phim ~90 phút đủ 3 độ phân giải tốn ~3–4 GB. Theo dõi dung lượng ở R2 → Metrics.
 
-## 5. API: Render
+## 5. API: Vercel (project thứ nhất)
 
-- [ ] New → Web Service → repo GitHub → Language **Docker**, Root Directory `api`, Dockerfile `./Dockerfile`, region **Singapore**, plan **Free**.
-- [ ] Health Check Path: `/healthz`.
-- [ ] Environment:
+Go runtime của Vercel (đang Beta) tự build `api/cmd/api` và chạy như một HTTP server. Cấu hình nằm ở `api/vercel.json`.
+
+- [ ] Add New → Project → repo → **Root Directory `api`**. Framework Preset tự nhận **Go** (nếu không, chọn Go).
+      Đặt tên project, ví dụ `lumen-api` → URL `https://lumen-api.vercel.app`.
+- [ ] Settings → Functions → Function Region: `hnd1` hoặc `sin1` (theo region Supabase).
+- [ ] Environment Variables (Production):
 
       | Key | Giá trị |
       |---|---|
-      | `DATABASE_URL` | Neon direct URL |
+      | `DATABASE_URL` | Supabase Session pooler URL (port 5432) |
       | `TMDB_TOKEN` | từ bước 2 |
       | `TMDB_LANGUAGE` / `TMDB_REGION` | `vi-VN` / `VN` |
       | `SESSION_SECRET` | `openssl rand -hex 32` (tạo mới, khác local) |
@@ -69,27 +80,30 @@ Ghi lại mọi giá trị bí mật vào trình quản lý mật khẩu, **khô
       | `R2_BUCKET` | `lumen-media` |
       | `MEDIA_BASE_URL` | `https://media.<domain>` |
 
-- [ ] Deploy xong: mở `https://<api>.onrender.com/healthz` → `ok`; `/api/browse` trả về JSON.
+- [ ] Deploy xong: mở `https://lumen-api.vercel.app/healthz` → `ok`; `/api/browse` trả về JSON.
+- [ ] Settings → Deployment Protection: tắt **Vercel Authentication** cho Production nếu nó bật,
+      nếu không project web sẽ nhận 401 khi gọi API.
 
-## 6. Web: Vercel
+## 6. Web: Vercel (project thứ hai)
 
 - [ ] Add New → Project → repo → Root Directory `web`, framework Next.js.
-- [ ] Env: `API_URL=https://<api>.onrender.com` (dùng lúc build cho rewrite `/api`; đổi thì phải **Redeploy**).
-- [ ] Settings → Functions → Function Region: **Singapore (sin1)**.
+- [ ] Env: `API_URL=https://lumen-api.vercel.app` (dùng lúc build cho rewrite `/api`; đổi thì phải **Redeploy**).
+- [ ] Settings → Functions → Function Region: cùng region với project API.
 - [ ] Settings → Domains → thêm `<domain>` (và `www.<domain>` redirect về nó). Trên Cloudflare DNS, bản ghi trỏ về Vercel để **DNS only** (mây xám).
-- [ ] Nếu domain cuối khác lúc cấu hình bước 5: sửa `SITE_ORIGIN` trên Render và CORS của R2 cho khớp.
+- [ ] Nếu domain cuối khác lúc cấu hình bước 5: sửa `SITE_ORIGIN` ở project API (rồi Redeploy) và CORS của R2 cho khớp.
 
 ## 7. Worker (encode) trên máy bạn
 
 - [ ] Tạo file env production tên `api/prod.env.local` (khớp `*.env.local` trong `.gitignore`, không bị commit).
-      Nội dung: `DATABASE_URL` (Neon), các biến `R2_*`, `MEDIA_BASE_URL`, `TMDB_TOKEN`, `WORK_DIR`, `DELETE_SOURCES=true`.
+      Nội dung: `DATABASE_URL` (Supabase production), các biến `R2_*`, `MEDIA_BASE_URL`, `TMDB_TOKEN`, `WORK_DIR`, `DELETE_SOURCES=true`.
 - [ ] Chạy khi có phim cần encode: `set -a; . <file env>; set +a; cd api && go run ./cmd/worker` (cần `ffmpeg`).
 
-## 8. Giữ API không ngủ (tuỳ chọn)
+## 8. Giữ DB không bị tạm dừng
 
-- [ ] cron-job.org → job GET `https://<api>.onrender.com/healthz` mỗi 10 phút.
-      Render free ngủ sau 15 phút rảnh, khởi động lại mất 30–60 giây. 750 giờ free/tháng đủ cho 1 service chạy 24/7.
-      Neon vẫn tự nghỉ sau 5 phút, request đầu tiên sau đó chậm thêm ~1 giây.
+- [ ] Không cần làm gì thêm: `api/vercel.json` có cron gọi `/api/browse` mỗi ngày lúc 03:00 UTC, đủ để Supabase
+      không tạm dừng project vì 7 ngày ít truy vấn. Kiểm tra ở project API → Settings → Cron Jobs.
+      Nếu vẫn bị dừng, vào dashboard Supabase bấm *Restore*.
+- Vercel Functions không ngủ 15 phút như Render. Sau lúc rảnh chỉ có cold start ngắn (khởi động Go binary và mở kết nối DB).
 
 ## 9. Kiểm tra sau khi lên
 
@@ -97,11 +111,12 @@ Ghi lại mọi giá trị bí mật vào trình quản lý mật khẩu, **khô
 - [ ] `/studio`: đăng nhập, tìm TMDB, upload một clip ngắn → trạng thái *Queued* → worker encode → *Ready* → tick **Published**.
 - [ ] Phim phát được trên máy tính và điện thoại; phụ đề `.vtt` hiện đúng.
 - [ ] DevTools → Network: file `.m3u8`/`.ts` tải từ `media.<domain>`, không lỗi CORS.
-- [ ] Sai mật khẩu 5 lần → bị khoá 15 phút (429).
+- [ ] Sai mật khẩu 5 lần → bị khoá 15 phút (429). Bộ đếm nằm trong bộ nhớ từng instance, nên trên Vercel
+      nó có thể reset khi instance đổi. Vì vậy nên làm thêm bước 10.
 
 ## 10. Bảo mật thêm (khuyến nghị)
 
 - [ ] Cloudflare Zero Trust → Access → bảo vệ `/studio*` và `/api/admin*` bằng email của bạn (free ≤ 50 user).
       Access chỉ chặn được khi bản ghi DNS bật proxy (mây cam), trái với cấu hình DNS only ở bước 6;
       Vercel vẫn chạy sau proxy nhưng không khuyến khích. Làm sau khi site đã ổn định.
-- [ ] Đổi `SESSION_SECRET` trên Render để đăng xuất mọi phiên khi cần.
+- [ ] Đổi `SESSION_SECRET` ở project API (rồi Redeploy) để đăng xuất mọi phiên khi cần.
