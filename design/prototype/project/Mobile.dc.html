@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Lumen mobile home</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&amp;family=DM+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#0E0E10;font-family:'DM Sans',system-ui,sans-serif;color:#F2EFE9}
+a{color:#E8A33D}a:hover{color:#F4C06F}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; background: #0E0E10; color: #F2EFE9; display: flex; flex-direction: column; font-family: 'DM Sans', system-ui, sans-serif; overflow: hidden">
+
+<header style="height: 60px; box-sizing: border-box; padding: 0 16px; display: flex; align-items: center; justify-content: space-between">
+<a href="Main.dc.html" style="display: flex; align-items: center; gap: 8px; text-decoration: none; color: #F2EFE9">
+<span style="width: 12px; height: 12px; border-radius: 3px; background: #E8A33D"></span>
+<span style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 22px; font-weight: 700">Lumen</span>
+</a>
+<a href="Browse.dc.html" aria-label="Search" style="width: 44px; height: 44px; border-radius: 22px; display: flex; align-items: center; justify-content: center; color: #F2EFE9; background: #17171B">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+</a>
+</header>
+
+<div style="display: flex; gap: 8px; padding: 4px 16px 14px; overflow: hidden">
+<span style="height: 34px; padding: 0 14px; border-radius: 17px; background: #E8A33D; color: #1A1206; display: flex; align-items: center; font-size: 13px; font-weight: 600; flex-shrink: 0">All</span>
+<span style="height: 34px; padding: 0 14px; border-radius: 17px; background: #17171B; border: 1px solid #2A2A30; display: flex; align-items: center; font-size: 13px; flex-shrink: 0">Comedy</span>
+<span style="height: 34px; padding: 0 14px; border-radius: 17px; background: #17171B; border: 1px solid #2A2A30; display: flex; align-items: center; font-size: 13px; flex-shrink: 0">Horror</span>
+<span style="height: 34px; padding: 0 14px; border-radius: 17px; background: #17171B; border: 1px solid #2A2A30; display: flex; align-items: center; font-size: 13px; flex-shrink: 0">Noir</span>
+<span style="height: 34px; padding: 0 14px; border-radius: 17px; background: #17171B; border: 1px solid #2A2A30; display: flex; align-items: center; font-size: 13px; flex-shrink: 0">Silent era</span>
+</div>
+
+<div style="margin: 0 16px; height: 400px; box-sizing: border-box; border-radius: 16px; padding: 20px; background: #3A2E1E; color: #F2DFC0; display: flex; flex-direction: column; justify-content: flex-end; gap: 12px">
+<span style="font-size: 12px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: #F4C06F">Featured</span>
+<span style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 48px; font-weight: 700; line-height: 0.95; letter-spacing: -0.02em">Metropolis</span>
+<span style="font-size: 13px">1927 · Sci-fi · 2h 33m</span>
+<div style="display: flex; gap: 10px">
+<a href="Detail.dc.html" style="flex-grow: 1; height: 46px; border-radius: 23px; background: #E8A33D; color: #1A1206; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 15px; font-weight: 600">
+<svg width="16" height="16" viewBox="0 0 24 24"><polygon points="6 4 20 12 6 20 6 4" fill="currentColor"></polygon></svg>
+Play
+</a>
+<button type="button" style="flex-grow: 1; height: 46px; border-radius: 23px; border: none; background: #52422E; color: #F2EFE9; font: 500 15px 'DM Sans', sans-serif">+ My list</button>
+</div>
+</div>
+
+<section style="padding: 22px 0 0 16px; display: flex; flex-direction: column; gap: 12px">
+<h2 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 19px; font-weight: 700">Trending this week</h2>
+<div style="display: flex; gap: 12px; overflow: hidden">
+<sc-for list="{{films}}" as="f" hint-placeholder-count="4">
+<a href="Detail.dc.html" style="width: 118px; height: 177px; flex-shrink: 0; box-sizing: border-box; border-radius: 8px; padding: 10px; display: flex; flex-direction: column; justify-content: flex-end; text-decoration: none; background: {{f.bg}}; color: {{f.fg}}">
+<span style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 16px; font-weight: 700; line-height: 1.05">{{f.t}}</span>
+</a>
+</sc-for>
+</div>
+</section>
+
+<nav aria-label="Tabs" style="margin-top: auto; height: 72px; box-sizing: border-box; border-top: 1px solid #1F1F24; background: #0E0E10; display: flex; justify-content: space-around; align-items: center">
+<a href="Main.dc.html" style="width: 88px; display: flex; flex-direction: column; align-items: center; gap: 4px; text-decoration: none; color: #E8A33D; font-size: 12px; font-weight: 600">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"></path></svg>
+Home
+</a>
+<a href="Browse.dc.html" style="width: 88px; display: flex; flex-direction: column; align-items: center; gap: 4px; text-decoration: none; color: #A9A6A0; font-size: 12px">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+Browse
+</a>
+<a href="Browse.dc.html" style="width: 88px; display: flex; flex-direction: column; align-items: center; gap: 4px; text-decoration: none; color: #A9A6A0; font-size: 12px">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12v18l-6-4-6 4z"></path></svg>
+My list
+</a>
+</nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+renderVals() {
+return {
+films: [
+{ t: 'Nosferatu', bg: '#2B2F3A', fg: '#DAD5C8' },
+{ t: 'Charade', bg: '#3D1F22', fg: '#F4D2D2' },
+{ t: 'Detour', bg: '#1E2B2A', fg: '#CBE4DF' },
+{ t: 'The Kid', bg: '#2F2A3A', fg: '#DDD6F0' }
+]
+};
+}
+}
+</script>
+</body>
+</html>

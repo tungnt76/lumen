@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Lumen browse</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&amp;family=DM+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#0E0E10;font-family:'DM Sans',system-ui,sans-serif;color:#F2EFE9}
+a{color:#E8A33D}a:hover{color:#F4C06F}
+</style>
+</helmet>
+<div style="width: 1440px; height: 1400px; box-sizing: border-box; background: #0E0E10; color: #F2EFE9; display: flex; flex-direction: column; font-family: 'DM Sans', system-ui, sans-serif; overflow: hidden">
+
+<header style="height: 72px; box-sizing: border-box; padding: 0 64px; display: flex; align-items: center; gap: 40px; border-bottom: 1px solid #1F1F24">
+<a href="Main.dc.html" style="display: flex; align-items: center; gap: 10px; text-decoration: none; color: #F2EFE9">
+<span style="width: 14px; height: 14px; border-radius: 3px; background: #E8A33D"></span>
+<span style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 26px; font-weight: 700; letter-spacing: -0.02em">Lumen</span>
+</a>
+<nav aria-label="Main" style="display: flex; gap: 28px; flex-grow: 1">
+<a href="Main.dc.html" style="color: #A9A6A0; text-decoration: none; font-size: 15px">Home</a>
+<a href="Browse.dc.html" style="color: #F2EFE9; text-decoration: none; font-size: 15px; font-weight: 600">Movies</a>
+<a href="Browse.dc.html" style="color: #A9A6A0; text-decoration: none; font-size: 15px">Genres</a>
+<a href="Browse.dc.html" style="color: #A9A6A0; text-decoration: none; font-size: 15px">Newly added</a>
+<a href="Browse.dc.html" style="color: #A9A6A0; text-decoration: none; font-size: 15px">My list</a>
+</nav>
+</header>
+
+<main style="box-sizing: border-box; padding: 44px 64px; display: flex; flex-direction: column; gap: 24px">
+<h1 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 48px; font-weight: 700; letter-spacing: -0.02em">Browse films</h1>
+
+<div style="height: 60px; box-sizing: border-box; padding: 0 20px; border-radius: 30px; background: #17171B; border: 1px solid #2A2A30; display: flex; align-items: center; gap: 14px">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#A9A6A0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+<label for="q" style="position: absolute; width: 1px; height: 1px; overflow: hidden">Search films</label>
+<input id="q" type="search" placeholder="Search titles, actors, directors" style="flex-grow: 1; height: 40px; border: none; background: transparent; color: #F2EFE9; font: 400 17px 'DM Sans', sans-serif; outline: none">
+<span style="font-size: 13px; color: #A9A6A0">Press / to search</span>
+</div>
+
+<div role="group" aria-label="Genres" style="display: flex; gap: 10px; flex-wrap: wrap">
+<sc-for list="{{genres}}" as="g" hint-placeholder-count="8">
+<sc-if value="{{g.on}}" hint-placeholder-val="{{false}}">
+<button type="button" onClick="{{g.pick}}" aria-pressed="true" style="height: 44px; padding: 0 20px; border-radius: 22px; border: 1px solid #E8A33D; background: #E8A33D; color: #1A1206; font: 600 14px 'DM Sans', sans-serif">{{g.name}}</button>
+</sc-if>
+<sc-if value="{{g.off}}" hint-placeholder-val="{{true}}">
+<button type="button" onClick="{{g.pick}}" aria-pressed="false" style="height: 44px; padding: 0 20px; border-radius: 22px; border: 1px solid #2E2E35; background: #151518; color: #F2EFE9; font: 500 14px 'DM Sans', sans-serif">{{g.name}}</button>
+</sc-if>
+</sc-for>
+</div>
+
+<div style="display: flex; align-items: center; gap: 14px; font-size: 14px">
+<span style="color: #A9A6A0; flex-grow: 1">{{count}}</span>
+<label for="decade" style="color: #A9A6A0">Decade</label>
+<select id="decade" style="height: 40px; padding: 0 12px; border-radius: 8px; border: 1px solid #2E2E35; background: #151518; color: #F2EFE9; font: 500 14px 'DM Sans', sans-serif"><option>Any</option><option>1900s–1920s</option><option>1930s–1940s</option><option>1950s–1960s</option></select>
+<label for="sort" style="color: #A9A6A0">Sort</label>
+<select id="sort" style="height: 40px; padding: 0 12px; border-radius: 8px; border: 1px solid #2E2E35; background: #151518; color: #F2EFE9; font: 500 14px 'DM Sans', sans-serif"><option>Most popular</option><option>Newest added</option><option>Release year</option><option>A–Z</option></select>
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 32px 22px">
+<sc-for list="{{films}}" as="f" hint-placeholder-count="12">
+<a href="Detail.dc.html" style="display: flex; flex-direction: column; gap: 10px; text-decoration: none; color: #F2EFE9">
+<div style="height: 300px; box-sizing: border-box; border-radius: 10px; padding: 16px; display: flex; flex-direction: column; justify-content: space-between; background: {{f.bg}}; color: {{f.fg}}">
+<span style="font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase">{{f.y}}</span>
+<span style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 26px; font-weight: 700; line-height: 1.05">{{f.t}}</span>
+</div>
+<div style="display: flex; flex-direction: column; gap: 2px">
+<span style="font-size: 15px; font-weight: 600">{{f.t}}</span>
+<span style="font-size: 13px; color: #A9A6A0">{{f.g}} · {{f.len}}</span>
+</div>
+</a>
+</sc-for>
+</div>
+
+<button type="button" style="align-self: center; height: 48px; padding: 0 28px; border-radius: 24px; border: 1px solid #34343B; background: transparent; color: #F2EFE9; font: 500 15px 'DM Sans', sans-serif">Load more</button>
+</main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1400}}'>
+class Component extends DCLogic {
+constructor(props) {
+super(props);
+this.state = { genre: 'All' };
+}
+renderVals() {
+const all = [
+{ t: 'Metropolis', y: '1927', g: 'Sci-fi', len: '2h 33m', bg: '#3A2E1E', fg: '#F2DFC0' },
+{ t: 'Nosferatu', y: '1922', g: 'Horror', len: '1h 34m', bg: '#2B2F3A', fg: '#DAD5C8' },
+{ t: 'Charade', y: '1963', g: 'Thriller', len: '1h 53m', bg: '#3D1F22', fg: '#F4D2D2' },
+{ t: 'Detour', y: '1945', g: 'Noir', len: '1h 8m', bg: '#1E2B2A', fg: '#CBE4DF' },
+{ t: 'His Girl Friday', y: '1940', g: 'Comedy', len: '1h 32m', bg: '#33262B', fg: '#F1DCE0' },
+{ t: 'D.O.A.', y: '1949', g: 'Noir', len: '1h 23m', bg: '#262A1E', fg: '#E0E6C8' },
+{ t: 'The Kid', y: '1921', g: 'Comedy', len: '1h 8m', bg: '#2F2A3A', fg: '#DDD6F0' },
+{ t: 'A Trip to the Moon', y: '1902', g: 'Sci-fi', len: '14m', bg: '#1E2638', fg: '#D3DDF2' },
+{ t: 'Night of the Living Dead', y: '1968', g: 'Horror', len: '1h 36m', bg: '#1F2224', fg: '#E3E3DD' },
+{ t: 'The Stranger', y: '1946', g: 'Noir', len: '1h 35m', bg: '#2A2426', fg: '#E8DADD' },
+{ t: 'Sherlock Jr.', y: '1924', g: 'Comedy', len: '45m', bg: '#2E2A22', fg: '#EDE3CC' },
+{ t: 'The Cabinet of Dr. Caligari', y: '1920', g: 'Horror', len: '1h 16m', bg: '#35231E', fg: '#F0D2C6' },
+{ t: 'Scarlet Street', y: '1945', g: 'Noir', len: '1h 42m', bg: '#3A1E24', fg: '#F2D0D6' },
+{ t: 'The General', y: '1926', g: 'Action', len: '1h 18m', bg: '#3B3324', fg: '#EFE3C8' }
+];
+const names = ['All', 'Comedy', 'Horror', 'Noir', 'Sci-fi', 'Thriller', 'Action'];
+const cur = this.state.genre;
+const films = (cur === 'All' ? all : all.filter((f) => f.g === cur)).slice(0, 12);
+return {
+genres: names.map((n) => ({ name: n, on: n === cur, off: n !== cur, pick: () => this.setState({ genre: n }) })),
+films: films,
+count: films.length + (films.length === 1 ? ' film' : ' films') + (cur === 'All' ? '' : ' in ' + cur)
+};
+}
+}
+</script>
+</body>
+</html>

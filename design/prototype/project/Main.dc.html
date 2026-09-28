@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Lumen home</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&amp;family=DM+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#0E0E10;font-family:'DM Sans',system-ui,sans-serif;color:#F2EFE9}
+a{color:#E8A33D}a:hover{color:#F4C06F}
+</style>
+</helmet>
+<div style="width: 1440px; height: 2440px; box-sizing: border-box; background: #0E0E10; color: #F2EFE9; display: flex; flex-direction: column; font-family: 'DM Sans', system-ui, sans-serif; overflow: hidden">
+
+<header style="height: 72px; box-sizing: border-box; padding: 0 64px; display: flex; align-items: center; gap: 40px; background: #0E0E10; border-bottom: 1px solid #1F1F24">
+<a href="Main.dc.html" style="display: flex; align-items: center; gap: 10px; text-decoration: none; color: #F2EFE9">
+<span style="width: 14px; height: 14px; border-radius: 3px; background: #E8A33D"></span>
+<span style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 26px; font-weight: 700; letter-spacing: -0.02em">Lumen</span>
+</a>
+<nav aria-label="Main" style="display: flex; gap: 28px; flex-grow: 1">
+<a href="Main.dc.html" style="color: #F2EFE9; text-decoration: none; font-size: 15px; font-weight: 600">Home</a>
+<a href="Browse.dc.html" style="color: #A9A6A0; text-decoration: none; font-size: 15px">Movies</a>
+<a href="Browse.dc.html" style="color: #A9A6A0; text-decoration: none; font-size: 15px">Genres</a>
+<a href="Browse.dc.html" style="color: #A9A6A0; text-decoration: none; font-size: 15px">Newly added</a>
+<a href="Browse.dc.html" style="color: #A9A6A0; text-decoration: none; font-size: 15px">My list</a>
+</nav>
+<a href="Browse.dc.html" aria-label="Search" style="width: 44px; height: 44px; border-radius: 22px; display: flex; align-items: center; justify-content: center; color: #F2EFE9; background: #17171B">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+</a>
+<button type="button" style="height: 36px; padding: 0 14px; border-radius: 18px; border: 1px solid #2E2E35; background: transparent; color: #F2EFE9; font: 500 13px 'DM Sans', sans-serif">VI · EN</button>
+</header>
+
+<section style="height: 620px; box-sizing: border-box; padding: 0 64px; display: flex; align-items: center; gap: 56px; background: #1A1410">
+<div style="width: 520px; display: flex; flex-direction: column; gap: 22px">
+<span style="font-size: 13px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: #E8A33D">Featured · Free to watch</span>
+<h1 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 96px; font-weight: 700; line-height: 0.92; letter-spacing: -0.03em">Metropolis</h1>
+<div style="display: flex; gap: 10px; align-items: center; font-size: 14px; color: #CFCAC0">
+<span style="padding: 4px 10px; border-radius: 6px; background: #2A221B">1927</span>
+<span style="padding: 4px 10px; border-radius: 6px; background: #2A221B">Sci-fi</span>
+<span style="padding: 4px 10px; border-radius: 6px; background: #2A221B">2h 33m</span>
+<span style="padding: 4px 10px; border-radius: 6px; background: #2A221B">Vietnamese subtitles</span>
+</div>
+<p style="margin: 0; font-size: 17px; line-height: 1.6; color: #CFCAC0">In a towering city split between wealthy planners above and workers below, the son of its master follows a young teacher into the depths and finds the machine that runs everything.</p>
+<div style="display: flex; gap: 12px; margin-top: 6px">
+<a href="Detail.dc.html" style="height: 52px; padding: 0 28px; border-radius: 26px; background: #E8A33D; color: #1A1206; text-decoration: none; display: flex; align-items: center; gap: 10px; font-size: 16px; font-weight: 600">
+<svg width="18" height="18" viewBox="0 0 24 24"><polygon points="6 4 20 12 6 20 6 4" fill="currentColor"></polygon></svg>
+Play
+</a>
+<a href="Detail.dc.html" style="height: 52px; padding: 0 24px; border-radius: 26px; background: #2E2620; color: #F2EFE9; text-decoration: none; display: flex; align-items: center; gap: 10px; font-size: 16px; font-weight: 500">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"></circle><line x1="12" y1="11" x2="12" y2="16"></line><line x1="12" y1="8" x2="12" y2="8"></line></svg>
+More info
+</a>
+<button type="button" aria-label="Add to my list" style="width: 52px; height: 52px; border-radius: 26px; border: 1px solid #4A3F35; background: transparent; color: #F2EFE9; display: flex; align-items: center; justify-content: center">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+</button>
+</div>
+</div>
+<div style="flex-grow: 1; height: 480px; border-radius: 16px; background: #2A2019; border: 1px solid #3A2E24; display: flex; flex-direction: column; justify-content: space-between; box-sizing: border-box; padding: 20px">
+<div style="display: flex; gap: 14px">
+<span style="width: 18px; height: 12px; border-radius: 2px; background: #3F332A"></span><span style="width: 18px; height: 12px; border-radius: 2px; background: #3F332A"></span><span style="width: 18px; height: 12px; border-radius: 2px; background: #3F332A"></span><span style="width: 18px; height: 12px; border-radius: 2px; background: #3F332A"></span><span style="width: 18px; height: 12px; border-radius: 2px; background: #3F332A"></span><span style="width: 18px; height: 12px; border-radius: 2px; background: #3F332A"></span><span style="width: 18px; height: 12px; border-radius: 2px; background: #3F332A"></span>
+</div>
+<span style="align-self: center; font-size: 14px; color: #A9A6A0">[Backdrop image · TMDB w1280]</span>
+<div style="display: flex; gap: 8px; align-self: flex-end">
+<span style="width: 28px; height: 6px; border-radius: 3px; background: #E8A33D"></span><span style="width: 6px; height: 6px; border-radius: 3px; background: #6B5E52"></span><span style="width: 6px; height: 6px; border-radius: 3px; background: #6B5E52"></span><span style="width: 6px; height: 6px; border-radius: 3px; background: #6B5E52"></span>
+</div>
+</div>
+</section>
+
+<main style="box-sizing: border-box; padding: 48px 64px 0; display: flex; flex-direction: column; gap: 52px">
+
+<section style="display: flex; flex-direction: column; gap: 16px">
+<div style="display: flex; align-items: baseline; gap: 12px">
+<h2 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 24px; font-weight: 700">Continue watching</h2>
+<span style="font-size: 13px; color: #A9A6A0">Saved on this device, no account needed</span>
+</div>
+<div style="display: flex; gap: 16px">
+<sc-for list="{{resume}}" as="r" hint-placeholder-count="4">
+<a href="Detail.dc.html" style="width: 316px; display: flex; flex-direction: column; gap: 10px; text-decoration: none; color: #F2EFE9">
+<div style="width: 316px; height: 178px; box-sizing: border-box; border-radius: 10px; padding: 16px; display: flex; flex-direction: column; justify-content: space-between; background: {{r.bg}}; color: {{r.fg}}">
+<span style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 22px; font-weight: 700">{{r.t}}</span>
+<div style="height: 4px; border-radius: 2px; background: rgba(0,0,0,0.35)"><div style="height: 4px; border-radius: 2px; background: #E8A33D; width: {{r.pct}}"></div></div>
+</div>
+<span style="font-size: 13px; color: #A9A6A0">{{r.left}}</span>
+</a>
+</sc-for>
+</div>
+</section>
+
+<section style="display: flex; flex-direction: column; gap: 16px">
+<div style="display: flex; align-items: baseline; justify-content: space-between">
+<h2 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 24px; font-weight: 700">Trending this week</h2>
+<a href="Browse.dc.html" style="font-size: 14px; text-decoration: none">See all</a>
+</div>
+<div style="display: flex; gap: 22px">
+<sc-for list="{{trending}}" as="f" hint-placeholder-count="6">
+<a href="Detail.dc.html" style="width: 200px; display: flex; flex-direction: column; gap: 10px; text-decoration: none; color: #F2EFE9">
+<div style="width: 200px; height: 300px; box-sizing: border-box; border-radius: 10px; padding: 16px; display: flex; flex-direction: column; justify-content: space-between; background: {{f.bg}}; color: {{f.fg}}">
+<span style="font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase">{{f.y}}</span>
+<span style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 26px; font-weight: 700; line-height: 1.05">{{f.t}}</span>
+</div>
+<div style="display: flex; flex-direction: column; gap: 2px">
+<span style="font-size: 15px; font-weight: 600">{{f.t}}</span>
+<span style="font-size: 13px; color: #A9A6A0">{{f.meta}}</span>
+</div>
+</a>
+</sc-for>
+</div>
+</section>
+
+<section style="display: flex; flex-direction: column; gap: 16px">
+<h2 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 24px; font-weight: 700">Top 5 on Lumen today</h2>
+<div style="display: flex; gap: 16px">
+<sc-for list="{{top}}" as="f" hint-placeholder-count="5">
+<a href="Detail.dc.html" style="width: 250px; display: flex; align-items: flex-end; text-decoration: none">
+<span style="width: 96px; font-family: 'Bricolage Grotesque', sans-serif; font-size: 190px; font-weight: 700; line-height: 0.78; color: #0E0E10; -webkit-text-stroke: 2px #6B6760; text-align: right; margin-right: -14px">{{f.n}}</span>
+<div style="width: 150px; height: 225px; box-sizing: border-box; border-radius: 10px; padding: 12px; display: flex; flex-direction: column; justify-content: flex-end; background: {{f.bg}}; color: {{f.fg}}">
+<span style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 20px; font-weight: 700; line-height: 1.05">{{f.t}}</span>
+</div>
+</a>
+</sc-for>
+</div>
+</section>
+
+<section style="display: flex; flex-direction: column; gap: 16px">
+<div style="display: flex; align-items: baseline; justify-content: space-between">
+<h2 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 24px; font-weight: 700">Silent-era classics</h2>
+<a href="Browse.dc.html" style="font-size: 14px; text-decoration: none">See all</a>
+</div>
+<div style="display: flex; gap: 22px">
+<sc-for list="{{silent}}" as="f" hint-placeholder-count="6">
+<a href="Detail.dc.html" style="width: 200px; display: flex; flex-direction: column; gap: 10px; text-decoration: none; color: #F2EFE9">
+<div style="width: 200px; height: 300px; box-sizing: border-box; border-radius: 10px; padding: 16px; display: flex; flex-direction: column; justify-content: space-between; background: {{f.bg}}; color: {{f.fg}}">
+<span style="font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase">{{f.y}}</span>
+<span style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 26px; font-weight: 700; line-height: 1.05">{{f.t}}</span>
+</div>
+<div style="display: flex; flex-direction: column; gap: 2px">
+<span style="font-size: 15px; font-weight: 600">{{f.t}}</span>
+<span style="font-size: 13px; color: #A9A6A0">{{f.meta}}</span>
+</div>
+</a>
+</sc-for>
+</div>
+</section>
+</main>
+
+<footer style="margin-top: auto; box-sizing: border-box; padding: 32px 64px 40px; border-top: 1px solid #1F1F24; display: flex; justify-content: space-between; align-items: center; gap: 32px">
+<div style="display: flex; flex-direction: column; gap: 6px; font-size: 13px; color: #A9A6A0">
+<span>Every film on Lumen is in the public domain or published with the rights holder's permission.</span>
+<span>This product uses the TMDB API but is not endorsed or certified by TMDB.</span>
+</div>
+<div style="display: flex; gap: 20px; align-items: center; font-size: 13px">
+<a href="Browse.dc.html" style="text-decoration: none; color: #A9A6A0">About</a>
+<a href="Browse.dc.html" style="text-decoration: none; color: #A9A6A0">Report a problem</a>
+<span style="padding: 6px 10px; border-radius: 6px; border: 1px solid #2E2E35; color: #A9A6A0">[TMDB logo]</span>
+</div>
+</footer>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":2440}}'>
+class Component extends DCLogic {
+renderVals() {
+return {
+resume: [
+{ t: 'Nosferatu', bg: '#2B2F3A', fg: '#DAD5C8', pct: '62%', left: '31 min left' },
+{ t: 'The General', bg: '#3B3324', fg: '#EFE3C8', pct: '25%', left: '58 min left' },
+{ t: 'His Girl Friday', bg: '#33262B', fg: '#F1DCE0', pct: '80%', left: '18 min left' },
+{ t: 'Detour', bg: '#1E2B2A', fg: '#CBE4DF', pct: '40%', left: '41 min left' }
+],
+trending: [
+{ t: 'Metropolis', y: '1927', meta: 'Sci-fi · 2h 33m', bg: '#3A2E1E', fg: '#F2DFC0' },
+{ t: 'Nosferatu', y: '1922', meta: 'Horror · 1h 34m', bg: '#2B2F3A', fg: '#DAD5C8' },
+{ t: 'Charade', y: '1963', meta: 'Thriller · 1h 53m', bg: '#3D1F22', fg: '#F4D2D2' },
+{ t: 'Night of the Living Dead', y: '1968', meta: 'Horror · 1h 36m', bg: '#1F2224', fg: '#E3E3DD' },
+{ t: 'His Girl Friday', y: '1940', meta: 'Comedy · 1h 32m', bg: '#33262B', fg: '#F1DCE0' },
+{ t: 'Detour', y: '1945', meta: 'Noir · 1h 8m', bg: '#1E2B2A', fg: '#CBE4DF' }
+],
+top: [
+{ n: '1', t: 'Metropolis', bg: '#3A2E1E', fg: '#F2DFC0' },
+{ n: '2', t: 'Charade', bg: '#3D1F22', fg: '#F4D2D2' },
+{ n: '3', t: 'Nosferatu', bg: '#2B2F3A', fg: '#DAD5C8' },
+{ n: '4', t: 'The Kid', bg: '#2F2A3A', fg: '#DDD6F0' },
+{ n: '5', t: 'D.O.A.', bg: '#262A1E', fg: '#E0E6C8' }
+],
+silent: [
+{ t: 'Sherlock Jr.', y: '1924', meta: 'Comedy · 45m', bg: '#2E2A22', fg: '#EDE3CC' },
+{ t: 'The Kid', y: '1921', meta: 'Comedy · 1h 8m', bg: '#2F2A3A', fg: '#DDD6F0' },
+{ t: 'Safety Last!', y: '1923', meta: 'Comedy · 1h 10m', bg: '#3A3020', fg: '#F4E4BF' },
+{ t: 'A Trip to the Moon', y: '1902', meta: 'Fantasy · 14m', bg: '#1E2638', fg: '#D3DDF2' },
+{ t: 'The Cabinet of Dr. Caligari', y: '1920', meta: 'Horror · 1h 16m', bg: '#35231E', fg: '#F0D2C6' },
+{ t: 'The General', y: '1926', meta: 'Action · 1h 18m', bg: '#3B3324', fg: '#EFE3C8' }
+]
+};
+}
+}
+</script>
+</body>
+</html>

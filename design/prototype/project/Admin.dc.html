@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Lumen Studio upload</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&amp;family=DM+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#0E0E10;font-family:'DM Sans',system-ui,sans-serif;color:#F2EFE9}
+a{color:#E8A33D}a:hover{color:#F4C06F}
+</style>
+</helmet>
+<div style="width: 1440px; height: 1200px; box-sizing: border-box; background: #0B0B0D; color: #F2EFE9; display: flex; font-family: 'DM Sans', system-ui, sans-serif; overflow: hidden">
+
+<aside style="width: 240px; box-sizing: border-box; padding: 24px 16px; background: #111114; border-right: 1px solid #1F1F24; display: flex; flex-direction: column; gap: 6px">
+<div style="display: flex; align-items: center; gap: 10px; padding: 0 10px 20px">
+<span style="width: 12px; height: 12px; border-radius: 3px; background: #E8A33D"></span>
+<span style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 22px; font-weight: 700">Lumen</span>
+<span style="padding: 2px 7px; border-radius: 6px; background: #2A2113; color: #F4C06F; font-size: 11px; font-weight: 600">Studio</span>
+</div>
+<nav aria-label="Studio" style="display: flex; flex-direction: column; gap: 4px">
+<a href="Admin.dc.html" style="height: 44px; padding: 0 12px; border-radius: 10px; display: flex; align-items: center; text-decoration: none; color: #A9A6A0; font-size: 15px">Dashboard</a>
+<a href="Admin.dc.html" style="height: 44px; padding: 0 12px; border-radius: 10px; display: flex; align-items: center; text-decoration: none; color: #1A1206; background: #E8A33D; font-size: 15px; font-weight: 600">Upload</a>
+<a href="Admin.dc.html" style="height: 44px; padding: 0 12px; border-radius: 10px; display: flex; align-items: center; text-decoration: none; color: #A9A6A0; font-size: 15px">Library</a>
+<a href="Admin.dc.html" style="height: 44px; padding: 0 12px; border-radius: 10px; display: flex; align-items: center; text-decoration: none; color: #A9A6A0; font-size: 15px">Home rows &amp; featured</a>
+<a href="Admin.dc.html" style="height: 44px; padding: 0 12px; border-radius: 10px; display: flex; align-items: center; text-decoration: none; color: #A9A6A0; font-size: 15px">Reports</a>
+<a href="Admin.dc.html" style="height: 44px; padding: 0 12px; border-radius: 10px; display: flex; align-items: center; text-decoration: none; color: #A9A6A0; font-size: 15px">Settings</a>
+</nav>
+<a href="AdminLogin.dc.html" style="margin-top: auto; height: 44px; padding: 0 12px; display: flex; align-items: center; text-decoration: none; color: #A9A6A0; font-size: 14px">Sign out</a>
+</aside>
+
+<main style="flex-grow: 1; box-sizing: border-box; padding: 36px 44px; display: flex; flex-direction: column; gap: 28px">
+<div style="display: flex; align-items: center; justify-content: space-between">
+<h1 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 34px; font-weight: 700">Upload a film</h1>
+<a href="Main.dc.html" style="height: 40px; padding: 0 16px; border-radius: 20px; border: 1px solid #2E2E35; display: flex; align-items: center; text-decoration: none; color: #F2EFE9; font-size: 14px">View public site</a>
+</div>
+
+<div style="display: flex; gap: 28px">
+<div style="width: 690px; display: flex; flex-direction: column; gap: 20px">
+<div style="height: 170px; box-sizing: border-box; border-radius: 14px; border: 2px dashed #3A3A42; background: #111114; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px">
+<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#E8A33D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4"></path><polyline points="7 9 12 4 17 9"></polyline><path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"></path></svg>
+<span style="font-size: 16px; font-weight: 600">Drop a video file here, or <a href="Admin.dc.html">browse</a></span>
+<span style="font-size: 13px; color: #A9A6A0">.mp4 or .mkv source. It's encoded to HLS (360p, 720p, 1080p) and stored on R2.</span>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 8px">
+<label for="tmdb" style="font-size: 14px; font-weight: 500">Match on TMDB</label>
+<input id="tmdb" type="search" value="Metropolis 1927" style="height: 46px; box-sizing: border-box; padding: 0 14px; border-radius: 10px; border: 1px solid #2E2E35; background: #111114; color: #F2EFE9; font: 400 15px 'DM Sans', sans-serif">
+<div style="display: flex; gap: 14px; align-items: center; padding: 12px; border-radius: 12px; background: #151518; border: 1px solid #E8A33D">
+<div style="width: 48px; height: 72px; border-radius: 6px; background: #3A2E1E"></div>
+<div style="display: flex; flex-direction: column; gap: 3px; flex-grow: 1">
+<span style="font-size: 15px; font-weight: 600">Metropolis (1927)</span>
+<span style="font-size: 13px; color: #A9A6A0">Fritz Lang · Sci-fi, Drama · TMDB id [id]</span>
+</div>
+<span style="font-size: 13px; color: #F4C06F; font-weight: 600">Selected</span>
+</div>
+</div>
+
+<div style="display: flex; gap: 16px">
+<div style="flex-grow: 1; display: flex; flex-direction: column; gap: 8px">
+<label for="rights" style="font-size: 14px; font-weight: 500">Rights basis</label>
+<select id="rights" style="height: 46px; padding: 0 12px; border-radius: 10px; border: 1px solid #2E2E35; background: #111114; color: #F2EFE9; font: 400 15px 'DM Sans', sans-serif"><option>Public domain</option><option>Licensed by rights holder</option><option>Own production</option></select>
+</div>
+<div style="flex-grow: 1; display: flex; flex-direction: column; gap: 8px">
+<label for="subs" style="font-size: 14px; font-weight: 500">Subtitles (.vtt)</label>
+<div id="subs" style="height: 46px; box-sizing: border-box; padding: 0 12px; border-radius: 10px; border: 1px solid #2E2E35; background: #111114; display: flex; align-items: center; justify-content: space-between; font-size: 14px"><span>vi.vtt, en.vtt</span><a href="Admin.dc.html" style="text-decoration: none; font-size: 13px">Add</a></div>
+</div>
+</div>
+
+<label style="display: flex; gap: 12px; align-items: flex-start; font-size: 14px; line-height: 1.5; color: #CFCAC0">
+<input type="checkbox" checked style="width: 20px; height: 20px; margin: 1px 0 0; accent-color: #E8A33D">
+I confirm this film is in the public domain or we have written permission to publish it. Source link or licence is required.
+</label>
+
+<div style="display: flex; gap: 12px">
+<button type="button" style="height: 48px; padding: 0 26px; border-radius: 24px; border: none; background: #E8A33D; color: #1A1206; font: 600 15px 'DM Sans', sans-serif">Upload and encode</button>
+<button type="button" style="height: 48px; padding: 0 22px; border-radius: 24px; border: 1px solid #34343B; background: transparent; color: #F2EFE9; font: 500 15px 'DM Sans', sans-serif">Save as draft</button>
+</div>
+</div>
+
+<section style="flex-grow: 1; box-sizing: border-box; padding: 22px; border-radius: 14px; background: #151518; border: 1px solid #1F1F24; display: flex; flex-direction: column; gap: 14px; align-self: flex-start">
+<h2 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 20px; font-weight: 700">Encoding queue</h2>
+<sc-for list="{{jobs}}" as="j" hint-placeholder-count="4">
+<div style="display: flex; flex-direction: column; gap: 8px; padding-bottom: 14px; border-bottom: 1px solid #222228">
+<div style="display: flex; justify-content: space-between; align-items: center">
+<span style="font-size: 15px; font-weight: 600">{{j.t}}</span>
+<span style="padding: 3px 9px; border-radius: 6px; font-size: 12px; font-weight: 600; background: {{j.bg}}; color: {{j.fg}}">{{j.status}}</span>
+</div>
+<div style="height: 5px; border-radius: 3px; background: #26262C"><div style="height: 5px; border-radius: 3px; background: {{j.bar}}; width: {{j.pct}}"></div></div>
+<span style="font-size: 13px; color: #A9A6A0">{{j.note}}</span>
+</div>
+</sc-for>
+</section>
+</div>
+
+<section style="display: flex; flex-direction: column; gap: 12px">
+<div style="display: flex; justify-content: space-between; align-items: baseline">
+<h2 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 20px; font-weight: 700">Recently added</h2>
+<a href="Admin.dc.html" style="font-size: 14px; text-decoration: none">Open library</a>
+</div>
+<div style="border-radius: 14px; border: 1px solid #1F1F24; overflow: hidden">
+<div style="display: grid; grid-template-columns: 2.2fr 0.8fr 1.4fr 1.4fr 1fr 0.8fr; padding: 12px 18px; background: #151518; font-size: 13px; color: #A9A6A0">
+<span>Title</span><span>Year</span><span>Rights</span><span>Renditions</span><span>Status</span><span></span>
+</div>
+<sc-for list="{{lib}}" as="r" hint-placeholder-count="4">
+<div style="display: grid; grid-template-columns: 2.2fr 0.8fr 1.4fr 1.4fr 1fr 0.8fr; align-items: center; padding: 14px 18px; border-top: 1px solid #1F1F24; font-size: 14px">
+<span style="font-weight: 600">{{r.t}}</span><span style="color: #CFCAC0">{{r.y}}</span><span style="color: #CFCAC0">{{r.rights}}</span><span style="color: #CFCAC0">{{r.ren}}</span><span style="color: {{r.sc}}">{{r.status}}</span><a href="Admin.dc.html" style="text-decoration: none">Edit</a>
+</div>
+</sc-for>
+</div>
+</section>
+</main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1200}}'>
+class Component extends DCLogic {
+renderVals() {
+return {
+jobs: [
+{ t: 'Metropolis', status: 'Encoding', bg: '#2A2113', fg: '#F4C06F', bar: '#E8A33D', pct: '64%', note: '720p rendition, 64%' },
+{ t: 'Nosferatu', status: 'Ready', bg: '#16291F', fg: '#8FD8AE', bar: '#3FA56B', pct: '100%', note: '3 renditions on R2' },
+{ t: 'The General', status: 'Queued', bg: '#1E1E24', fg: '#CFCAC0', bar: '#3A3A42', pct: '0%', note: 'Waiting for worker' },
+{ t: 'Detour', status: 'Failed', bg: '#2E1616', fg: '#F2A7A7', bar: '#C94A4A', pct: '30%', note: 'Source audio track unreadable · Retry' }
+],
+lib: [
+{ t: 'Nosferatu', y: '1922', rights: 'Public domain', ren: '360 · 720 · 1080', status: 'Published', sc: '#8FD8AE' },
+{ t: 'Charade', y: '1963', rights: 'Public domain', ren: '360 · 720 · 1080', status: 'Published', sc: '#8FD8AE' },
+{ t: 'His Girl Friday', y: '1940', rights: 'Public domain', ren: '360 · 720', status: 'Draft', sc: '#CFCAC0' },
+{ t: 'Metropolis', y: '1927', rights: 'Public domain', ren: 'Encoding', status: 'Processing', sc: '#F4C06F' }
+]
+};
+}
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,9 @@
+.env
+*.env.local
+node_modules/
+.next/
+web/next-env.d.ts
+api/api
+api/worker
+api/admin
+api/bin/

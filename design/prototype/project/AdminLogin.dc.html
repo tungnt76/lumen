@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Lumen Studio sign in</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&amp;family=DM+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#0E0E10;font-family:'DM Sans',system-ui,sans-serif;color:#F2EFE9}
+a{color:#E8A33D}a:hover{color:#F4C06F}
+</style>
+</helmet>
+<div style="width: 1280px; height: 800px; box-sizing: border-box; background: #0B0B0D; color: #F2EFE9; display: flex; align-items: center; justify-content: center; font-family: 'DM Sans', system-ui, sans-serif">
+<form style="width: 420px; box-sizing: border-box; padding: 40px; border-radius: 18px; background: #151518; border: 1px solid #25252B; display: flex; flex-direction: column; gap: 18px">
+<div style="display: flex; align-items: center; gap: 10px">
+<span style="width: 14px; height: 14px; border-radius: 3px; background: #E8A33D"></span>
+<span style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 24px; font-weight: 700">Lumen</span>
+<span style="padding: 3px 8px; border-radius: 6px; background: #2A2113; color: #F4C06F; font-size: 12px; font-weight: 600">Studio</span>
+</div>
+<div style="display: flex; flex-direction: column; gap: 6px">
+<h1 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 28px; font-weight: 700">Admin sign in</h1>
+<p style="margin: 0; font-size: 14px; color: #A9A6A0">Staff only. This page is not linked from the public site.</p>
+</div>
+<div style="display: flex; flex-direction: column; gap: 6px">
+<label for="email" style="font-size: 14px; font-weight: 500">Email</label>
+<input id="email" type="email" autocomplete="username" style="height: 46px; box-sizing: border-box; padding: 0 14px; border-radius: 10px; border: 1px solid #2E2E35; background: #0E0E10; color: #F2EFE9; font: 400 15px 'DM Sans', sans-serif">
+</div>
+<div style="display: flex; flex-direction: column; gap: 6px">
+<label for="pw" style="font-size: 14px; font-weight: 500">Password</label>
+<input id="pw" type="password" autocomplete="current-password" style="height: 46px; box-sizing: border-box; padding: 0 14px; border-radius: 10px; border: 1px solid #2E2E35; background: #0E0E10; color: #F2EFE9; font: 400 15px 'DM Sans', sans-serif">
+</div>
+<div style="display: flex; flex-direction: column; gap: 6px">
+<label for="otp" style="font-size: 14px; font-weight: 500">Authenticator code</label>
+<input id="otp" inputmode="numeric" autocomplete="one-time-code" placeholder="6 digits" style="height: 46px; box-sizing: border-box; padding: 0 14px; border-radius: 10px; border: 1px solid #2E2E35; background: #0E0E10; color: #F2EFE9; font: 400 15px 'DM Sans', sans-serif; letter-spacing: 0.2em">
+</div>
+<button type="button" style="height: 48px; margin-top: 4px; border-radius: 24px; border: none; background: #E8A33D; color: #1A1206; font: 600 15px 'DM Sans', sans-serif">Sign in</button>
+<span style="font-size: 12px; color: #A9A6A0; text-align: center">5 failed attempts locks this device for 15 minutes.</span>
+</form>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":800}}'>
+class Component extends DCLogic {
+renderVals() { return {}; }
+}
+</script>
+</body>
+</html>
