@@ -9,6 +9,7 @@ package main
 
 import (
 	"context"
+	"errors"
 	"flag"
 	"fmt"
 	"net/url"
@@ -91,9 +92,14 @@ func main() {
 	}
 
 	tc := tmdb.New(env("TMDB_BASE_URL", "https://api.themoviedb.org/3"), token, env("TMDB_LANGUAGE", "vi-VN"), env("TMDB_REGION", "VN"))
-	added := 0
+	added, skipped := 0, 0
 	for i, s := range films {
 		f, err := seedOne(ctx, st, tc, s, i == 0)
+		if errors.Is(err, errExists) {
+			skipped++
+			fmt.Printf("exists  %s (%d), skipped\n", s.title, s.year)
+			continue
+		}
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "skip %s (%d): %v\n", s.title, s.year, err)
 			continue
@@ -109,7 +115,7 @@ func main() {
 	}
 	added += fillGenres(ctx, st, tc, *since, *perGenre)
 	backfillReleaseDates(ctx, st, tc)
-	fmt.Printf("\n%d films seeded. Remove them with: make seed-remove\n", added)
+	fmt.Printf("\n%d films seeded, %d already there (skipped). Remove them with: make seed-remove\n", added, skipped)
 }
 
 // fillGenres tops up every TMDB genre until the catalog has at least min published
@@ -228,8 +234,16 @@ func seedOne(ctx context.Context, st *store.Store, tc *tmdb.Client, s seedFilm, 
 	return addByID(ctx, st, tc, id, rights, featured)
 }
 
-// addByID stores a TMDB film as encoded and published.
+// errExists means the film is already in the library; seeding leaves it untouched.
+var errExists = errors.New("already in the library")
+
+// addByID stores a TMDB film as encoded and published, or returns errExists.
 func addByID(ctx context.Context, st *store.Store, tc *tmdb.Client, id int, rights string, featured bool) (*store.Film, error) {
+	if ok, err := st.FilmExists(ctx, id); err != nil {
+		return nil, err
+	} else if ok {
+		return nil, errExists
+	}
 	d, err := tc.Movie(ctx, id)
 	if err != nil {
 		return nil, err
@@ -245,7 +259,7 @@ func addByID(ctx context.Context, st *store.Store, tc *tmdb.Client, id int, righ
 	})
 	if err != nil {
 		if strings.Contains(err.Error(), "duplicate key") {
-			return nil, fmt.Errorf("already in the library")
+			return nil, errExists
 		}
 		return nil, err
 	}

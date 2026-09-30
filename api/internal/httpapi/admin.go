@@ -6,74 +6,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/tony/lumen/api/internal/auth"
 	"github.com/tony/lumen/api/internal/storage"
 	"github.com/tony/lumen/api/internal/store"
 	"github.com/tony/lumen/api/internal/tmdb"
 )
-
-const sessionTTL = 12 * time.Hour
-
-// POST /api/admin/login {email, password}
-func (s *Server) login(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Cache-Control", "no-store")
-	if !s.sameOrigin(r) {
-		writeErr(w, http.StatusForbidden, "bad origin")
-		return
-	}
-	ip := clientIP(r)
-	if !s.limiter.Allowed(ip) {
-		writeErr(w, http.StatusTooManyRequests, "too many attempts, try again in 15 minutes")
-		return
-	}
-	var in struct {
-		Email    string `json:"email"`
-		Password string `json:"password"`
-	}
-	if err := decode(r, &in); err != nil {
-		writeErr(w, http.StatusBadRequest, "bad request")
-		return
-	}
-	a, err := s.store.AdminByEmail(r.Context(), strings.TrimSpace(in.Email))
-	ok := false
-	if err == nil {
-		ok = auth.CheckPassword(a.PasswordHash, in.Password)
-	} else {
-		auth.DummyCheck(in.Password)
-	}
-	if !ok {
-		s.limiter.Fail(ip)
-		s.log.Warn("admin login failed", "ip", ip)
-		writeErr(w, http.StatusUnauthorized, "wrong email or password")
-		return
-	}
-	s.limiter.Reset(ip)
-	http.SetCookie(w, &http.Cookie{
-		Name: sessionCookie, Value: s.sessions.Issue(a.ID, sessionTTL), Path: "/",
-		HttpOnly: true, Secure: s.cfg.CookieSecure, SameSite: http.SameSiteStrictMode,
-		MaxAge: int(sessionTTL.Seconds()),
-	})
-	writeJSON(w, http.StatusOK, map[string]string{"email": a.Email})
-}
-
-// POST /api/admin/logout
-func (s *Server) logout(w http.ResponseWriter, _ *http.Request) {
-	http.SetCookie(w, &http.Cookie{Name: sessionCookie, Value: "", Path: "/", MaxAge: -1,
-		HttpOnly: true, Secure: s.cfg.CookieSecure, SameSite: http.SameSiteStrictMode})
-	w.WriteHeader(http.StatusNoContent)
-}
-
-func adminID(r *http.Request) int64 { id, _ := r.Context().Value(ctxKey{}).(int64); return id }
-
-// GET /api/admin/me
-func (s *Server) me(w http.ResponseWriter, r *http.Request) {
-	a, err := s.store.AdminByID(r.Context(), adminID(r))
-	if err != nil {
-		writeErr(w, http.StatusUnauthorized, "not signed in")
-		return
-	}
-	writeJSON(w, http.StatusOK, map[string]string{"email": a.Email})
-}
 
 // GET /api/admin/tmdb/search?q=&page=
 func (s *Server) adminTMDBSearch(w http.ResponseWriter, r *http.Request) {

@@ -65,3 +65,39 @@ func encodeSample(t *testing.T, withAudio bool) {
 
 func TestRunWithAudio(t *testing.T)  { encodeSample(t, true) }
 func TestRunSilentFilm(t *testing.T) { encodeSample(t, false) }
+
+func TestAudio(t *testing.T) {
+	if _, err := exec.LookPath("ffmpeg"); err != nil {
+		t.Skip("ffmpeg not installed")
+	}
+	dir := t.TempDir()
+	src := filepath.Join(dir, "src.wav")
+	if out, err := exec.Command("ffmpeg", "-hide_banner", "-loglevel", "error", "-f", "lavfi",
+		"-i", "sine=frequency=220:duration=5", "-ac", "2", src).CombinedOutput(); err != nil {
+		t.Fatalf("make sample: %v %s", err, out)
+	}
+	for _, speech := range []bool{true, false} {
+		dst := filepath.Join(dir, "out.m4a")
+		secs, err := Audio(context.Background(), src, dst, speech)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if secs != 5 {
+			t.Errorf("speech=%v: duration %d, want 5", speech, secs)
+		}
+		probe, err := exec.Command("ffprobe", "-v", "error", "-show_entries", "stream=codec_name,channels", "-of", "csv=p=0", dst).Output()
+		if err != nil {
+			t.Fatal(err)
+		}
+		want := "aac,2"
+		if speech {
+			want = "aac,1"
+		}
+		if got := strings.TrimSpace(string(probe)); got != want {
+			t.Errorf("speech=%v: stream %q, want %q", speech, got, want)
+		}
+	}
+	if _, err := Audio(context.Background(), filepath.Join(dir, "missing.wav"), filepath.Join(dir, "x.m4a"), true); err == nil {
+		t.Error("missing source encoded")
+	}
+}

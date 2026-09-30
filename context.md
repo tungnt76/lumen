@@ -33,6 +33,7 @@ Only public-domain or licensed films are hosted. No pirated streams.
 Public:
 
 - `GET /api/home`, `/api/genres`, `/api/movies/{tmdbId}`, `/api/browse?genre=&page=`, `/api/search?q=&page=`. List endpoints return `{items, page, totalPages, total}`
+- Audio: `GET /api/books?q=&lang=&page=`, `/api/music?q=&page=`, `/api/works/{id}` (work + tracks). Works are books or albums in `works`/`tracks`; a track's `audio` is an absolute URL (e.g. archive.org) or an R2 key. A work can be published only once it has tracks, or (license `external`) official `links`: current artists such as Đen Vâu are link-out cards imported from MusicBrainz, never hosted. Web: `/books`, `/music`, `/books/[id]`, `/music/[id]`, a site-wide `AudioProvider` player (`web/components/AudioPlayer.tsx`) with resume position in localStorage, "Continue listening" on Home, works in My list. Demo data: `make seed-audio`. Studio `/studio/works` (admin API `/api/admin/works*`): import from LibriVox / Internet Archive / MusicBrainz, create a work, upload .mp3/.m4a via presigned PUT to `audio/{id}/u{hex}.ext`, replace the track list (audio must be an existing track or an uploaded key for that work), publish/feature/delete. Search uses the `works.search` column (Fold: lowercase, no diacritics, đ→d). Also: content comes from `api/cmd/import-audio` (`make import ARGS=...`): LibriVox and Internet Archive (metadata only, audio stays on archive.org), Wikisource text + local TTS (Piper default, VieNeu via `scripts/tts_vieneu.py`) or local files, encoded to AAC and uploaded to R2 `audio/{id}/{stamp}/`. See README section 5.
 
 Admin (cookie auth + Origin check):
 
@@ -56,6 +57,30 @@ Admin (cookie auth + Origin check):
   - Suggested extra: Cloudflare Access in front of `/studio*`.
 - Removed the "Top 5" row: there's no view tracking, so the ranking would be fake.
 
+## Excalidraw
+
+- Public tab "Excalidraw" beside My list → `/draw` (`web/components/DrawHome.tsx`): visitors get `GuestDrawing` (canvas saved in localStorage `lumen:drawing`, "Sign in to save"); signed-in users get "My drawings" (`DrawingList`, base `/api/drawings`) and the editor `/draw/[id]` (`DrawingEditor` embedded), plus an offer to import the pre-sign-in sketch (`lib/drawings.ts importLocalScene`).
+- Studio → Excalidraw (`/studio/drawings`, base `/api/admin/drawings`) lists everyone's drawings with owner names.
+- Table `drawings` (owner_id → users, title, token, size, saved_at); files in the media bucket at `drawings/{id}-{token}/scene.excalidraw` + `preview.png`, uploaded/downloaded by the browser with presigned URLs. API handlers in `httpapi/drawings.go` with a scope: own (404 for others' ids) or all (admin). Limits: 50 MB each, 100 per member.
+
+## Accounts
+
+- Tables `users` (email, bcrypt hash, display_name, role admin|member, avatar preset id, bio, disabled), `sessions` (sha256 of a random token, user, UA, IP, sliding 30-day expiry), `invite_codes` (6-digit code, role, max_uses/uses, expiry, disabled; wrong codes rate-limited per IP and site-wide). Old `admins` rows are copied into `users` as admins on startup.
+- Cookie `lumen_session` (HttpOnly, Lax) + readable hint `lumen_auth=1` so the web only calls `/api/auth/me` for signed-in browsers. Middleware `signedIn` / `admin` in `httpapi/server.go`; handlers in `httpapi/auth.go` and `admin_users.go`.
+- Web: `/login`, `/signup` (2 steps, `?code=` prefill), `/account`, header `AccountMenu`, `Avatar` presets (`web/components/Avatar.tsx`, ids mirrored in `httpapi/auth.go`), Studio → Users. CLI: `cmd/users seed|invite|list`, `cmd/admin`.
+
+## Code tab (phase 1 done)
+
+- `/code` (`CodeHome`: guest scratch in localStorage `lumen:code`, or `CodeList` "My code"), `/code/[id]` and `/studio/code[/id]` use `CodeWorkspace` (Monaco via `@monaco-editor/react`, CDN monaco 0.57.0): explorer, tabs, status bar, source control (changes vs last commit, commit, history, DiffEditor, restore), drafts in localStorage `lumen:code-draft:{id}`, phones read-only.
+- API `httpapi/code.go` (scopes own/all like drawings): list/create/get/rename/delete, uploads + saved (server reads bundle back), commits list/create (R2 CopyObject of project.json → commits/{id}.json, keeps 200)/get. Store `store/code.go`, migration 0002. Tests use an in-memory fake S3 (`httpapi/fakes3_test.go`).
+- Next: phase 2 run code (sandboxed iframe for HTML/JS, Pyodide for Python), phase 3 GitHub import/push via OAuth.
+
+## Migrations and ids
+
+- `schema.sql` (idempotent, every start) + `store/migrations/NNNN_*.sql` (once each, tracked in `schema_migrations`, advisory lock; runner `store/migrate.go`; `make migrate`).
+- 0001: works and drawings ids are UUID v7 (Postgres function `uuid_v7(ts)`, column default); Go/TS use string ids; routes validate UUIDs. Old storage folders kept in `works.media_prefix` / `drawings.folder` (`Work.AudioFolder()`, `Drawing.Folder()`). Films, users, tracks keep bigint ids.
+- `make reset-data [STORAGE=1]` (`cmd/reset`, `store.ResetAll`): drops all Lumen tables after typing "delete", recreates the empty schema; optional R2 cleanup of audio/ and drawings/.
+
 ## Env vars (api/.env.example)
 
 - Database and TMDB: `DATABASE_URL`, `TMDB_TOKEN`, `TMDB_LANGUAGE=vi-VN`, `TMDB_REGION=VN`
@@ -77,7 +102,7 @@ Admin (cookie auth + Origin check):
 ## Design
 
 Prototype canvas (Artifact "Film Site Prototype"), 6 screens: Home, Movie + player, Browse, Mobile home, Admin sign-in, Admin upload.
-Look: dark background #0E0E10, amber accent #E8A33D, fonts Bricolage Grotesque (headings) and DM Sans (body). Placeholder brand name "Lumen".
+Look: dark theme by default (#0E0E10); optional light theme (page #EFEAE2 with white nav, tab bar, search, cards and lists, shadows on covers; amber text #8F5400), amber accent #E8A33D. Light is chosen only with the header sun/moon button (saved in localStorage `lumen:theme`, applied before paint by an inline script; no system/auto mode; tokens in `web/app/globals.css`, logic in `web/lib/theme.ts`). Logo: `web/components/Logo.tsx`, favicon files in `web/app/`. Originally: dark background #0E0E10, amber accent #E8A33D, fonts Bricolage Grotesque (headings) and DM Sans (body). Placeholder brand name "Lumen".
 
 ## Next steps
 

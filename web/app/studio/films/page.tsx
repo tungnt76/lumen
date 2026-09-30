@@ -7,6 +7,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import type { Film, Page } from "@/lib/api";
 import { adminFetch, ApiError, putFile, videoType } from "@/lib/studio";
 import { UploadIcon } from "@/components/icons";
+import { StudioShell } from "@/components/StudioShell";
 
 type Match = { tmdbId: number; title: string; year: number; poster: string };
 
@@ -20,7 +21,6 @@ const statusLabel: Record<Film["status"], [string, string]> = {
 
 export default function StudioFilms() {
   const router = useRouter();
-  const [email, setEmail] = useState("");
   const [films, setFilms] = useState<Film[]>([]);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
@@ -42,10 +42,6 @@ export default function StudioFilms() {
     }
   }, [page, router]);
 
-  useEffect(() => {
-    adminFetch<{ email: string }>("/me").then((m) => setEmail(m.email)).catch(() => router.replace("/studio"));
-  }, [router]);
-
   useEffect(() => { void load(); }, [load]);
 
   // New films are listed first, so show page 1 after an upload.
@@ -59,44 +55,23 @@ export default function StudioFilms() {
     return () => window.clearInterval(t);
   }, [busy, load]);
 
-  async function logout() {
-    await adminFetch("/logout", { method: "POST" }).catch(() => {});
-    router.replace("/studio");
-  }
-
-  if (!email) return null;
-
   return (
-    <div className="studio">
-      <aside className="side">
-        <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "0 10px 20px" }}>
-          <span className="logo-mark" style={{ width: 12, height: 12 }} />
-          <span className="logo-word" style={{ fontSize: 22 }}>Lumen</span>
-          <span className="chip chip-accent" style={{ fontSize: 11, fontWeight: 600, padding: "2px 7px" }}>Studio</span>
-        </div>
-        <Link href="/studio/films" aria-current="page">Films</Link>
-        <Link href="/" target="_blank">View public site</Link>
-        <span className="muted" style={{ marginTop: "auto", padding: "0 12px", fontSize: 13 }}>{email}</span>
-        <button type="button" className="btn" style={{ height: 40, margin: "8px 12px 0" }} onClick={logout}>Sign out</button>
-      </aside>
-
-      <main className="studio-main">
-        <h1 style={{ fontSize: 34 }}>Films</h1>
-        <UploadForm onCreated={showNewest} />
-        <section style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-          <h2 style={{ fontSize: 20 }}>Library{total > 0 && <span className="muted" style={{ fontWeight: 400 }}> · {total}</span>}</h2>
-          {loadError && <p className="error" role="alert">{loadError}</p>}
-          <FilmsTable films={films} reload={load} />
-          {totalPages > 1 && (
-            <nav aria-label="Pages" className="pager">
-              <button type="button" className="btn" disabled={page <= 1} onClick={() => setPage(page - 1)}>Previous</button>
-              <span className="muted">Page {page} of {totalPages}</span>
-              <button type="button" className="btn" disabled={page >= totalPages} onClick={() => setPage(page + 1)}>Next</button>
-            </nav>
-          )}
-        </section>
-      </main>
-    </div>
+    <StudioShell active="/studio/films">
+      <h1 style={{ fontSize: 34 }}>Films</h1>
+      <UploadForm onCreated={showNewest} />
+      <section style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+        <h2 style={{ fontSize: 20 }}>Library{total > 0 && <span className="muted" style={{ fontWeight: 400 }}> · {total}</span>}</h2>
+        {loadError && <p className="error" role="alert">{loadError}</p>}
+        <FilmsTable films={films} reload={load} />
+        {totalPages > 1 && (
+          <nav aria-label="Pages" className="pager">
+            <button type="button" className="btn" disabled={page <= 1} onClick={() => setPage(page - 1)}>Previous</button>
+            <span className="muted">Page {page} of {totalPages}</span>
+            <button type="button" className="btn" disabled={page >= totalPages} onClick={() => setPage(page + 1)}>Next</button>
+          </nav>
+        )}
+      </section>
+    </StudioShell>
   );
 }
 
@@ -185,7 +160,7 @@ function UploadForm({ onCreated }: { onCreated: () => void }) {
             <span style={{ fontWeight: 600 }}>{picked.title} ({picked.year || "?"})</span>
             <span className="muted" style={{ fontSize: 13 }}>TMDB {picked.tmdbId} · click to change</span>
           </span>
-          <span style={{ color: "var(--accent-hover)", fontSize: 13, fontWeight: 600 }}>Selected</span>
+          <span style={{ color: "var(--accent-text)", fontSize: 13, fontWeight: 600 }}>Selected</span>
         </button>
       )}
 
@@ -299,7 +274,7 @@ function FilmsTable({ films, reload }: { films: Film[]; reload: () => void }) {
                     {f.status === "failed" && (
                       <div style={{ fontSize: 12, marginTop: 4 }}>
                         <span className="error" style={{ fontSize: 12 }}>{f.error}</span>{" "}
-                        <button type="button" onClick={() => retry(f)} style={{ background: "none", border: 0, color: "var(--accent)", cursor: "pointer", padding: 0 }}>Retry</button>
+                        <button type="button" onClick={() => retry(f)} style={{ background: "none", border: 0, color: "var(--accent-text)", cursor: "pointer", padding: 0 }}>Retry</button>
                       </div>
                     )}
                   </td>

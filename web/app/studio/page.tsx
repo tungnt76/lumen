@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { FormEvent, useEffect, useState } from "react";
 import { adminFetch } from "@/lib/studio";
+import { LogoMark } from "@/components/Logo";
 
 export default function StudioLogin() {
   const router = useRouter();
@@ -35,7 +36,7 @@ export default function StudioLogin() {
     <div className="login-wrap">
       <form className="login" onSubmit={submit} noValidate>
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <span className="logo-mark" />
+          <LogoMark size={28} />
           <span className="logo-word" style={{ fontSize: 24 }}>Lumen</span>
           <span className="chip chip-accent" style={{ fontSize: 12, fontWeight: 600 }}>Studio</span>
         </div>

@@ -29,8 +29,7 @@ func TestAdminLoginFlow(t *testing.T) {
 	defer st.Close()
 
 	hash, _ := auth.HashPassword("correct horse battery")
-	secret, _ := auth.NewTOTPSecret()
-	if err := st.UpsertAdmin(ctx, "admin@lumen.test", hash, secret); err != nil {
+	if _, err := st.UpsertUser(ctx, "admin@lumen.test", hash, "Admin", "admin", "film"); err != nil {
 		t.Fatal(err)
 	}
 
@@ -78,8 +77,15 @@ func TestAdminLoginFlow(t *testing.T) {
 			session = c
 		}
 	}
-	if session == nil || !session.HttpOnly || !session.Secure || session.SameSite != http.SameSiteStrictMode {
+	if session == nil || !session.HttpOnly || !session.Secure || session.SameSite != http.SameSiteLaxMode {
 		t.Fatalf("session cookie flags: %+v", session)
+	}
+	hint := false
+	for _, c := range res.Cookies() {
+		hint = hint || (c.Name == authHint && c.Value == "1" && !c.HttpOnly)
+	}
+	if !hint {
+		t.Fatal("login didn't set the readable auth hint cookie")
 	}
 
 	req, _ := http.NewRequest(http.MethodGet, srv.URL+"/api/admin/me", nil)

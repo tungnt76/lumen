@@ -11,7 +11,7 @@ LOAD    := set -a; [ -f $(CURDIR)/$(ENV) ] && . $(CURDIR)/$(ENV); set +a;
 LOCAL_DB := postgres://lumen:lumen@localhost:5432/lumen?sslmode=disable
 
 .PHONY: help setup env db-up db-down db-reset admin api worker web dev \
-        seed seed-remove test test-db typecheck build docker-api docker-worker fmt tidy clean check-env
+        r2-cors reset-data migrate seed seed-all seed-users invite seed-remove seed-audio seed-audio-remove import test test-db typecheck build docker-api docker-worker fmt tidy clean check-env
 
 help: ## Show this help
 	@awk 'BEGIN{FS=":.*## "; printf "\nUsage: make <target>\n\n"} /^[a-zA-Z_-]+:.*## /{printf "  \033[33m%-14s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
@@ -67,6 +67,38 @@ dev: check-env ## Run API + worker + web together (Ctrl+C stops all)
 seed: check-env ## Add demo public-domain films (no video) to preview the home page
 	$(LOAD) cd $(API_DIR) && go run ./cmd/seed
 
+import: check-env ## Import audiobooks/music: make import ARGS="librivox -publish 52" (see README)
+	$(LOAD) cd $(API_DIR) && go run ./cmd/import-audio $(ARGS)
+
+seed-all: check-env ## Seed everything (demo films, audiobooks, music, accounts); existing records are skipped
+	@echo "== films =="
+	@$(MAKE) --no-print-directory seed
+	@echo "\n== audiobooks and music =="
+	@$(MAKE) --no-print-directory seed-audio
+	@echo "\n== accounts =="
+	@$(MAKE) --no-print-directory seed-users
+
+r2-cors: check-env ## Let the site upload to R2 from the browser (sets bucket CORS; ARGS="-origin https://…" adds sites)
+	$(LOAD) cd $(API_DIR) && go run ./cmd/r2cors $(ARGS)
+
+reset-data: check-env ## DELETE all Lumen data (asks first); STORAGE=1 also clears audio/ and drawings/ on R2
+	$(LOAD) cd $(API_DIR) && go run ./cmd/reset $(if $(STORAGE),-storage)
+
+migrate: check-env ## Apply pending database migrations (the API also does this on start)
+	$(LOAD) cd $(API_DIR) && go run ./cmd/users migrate
+
+seed-users: check-env ## Seed accounts: admin (EMAIL=you@example.com), demo member, invite code
+	$(LOAD) cd $(API_DIR) && go run ./cmd/users seed $(if $(EMAIL),-admin "$(EMAIL)")
+
+invite: check-env ## New invite code: make invite ARGS="-uses 5 -days 30 -note team"
+	$(LOAD) cd $(API_DIR) && go run ./cmd/users invite $(ARGS)
+
+seed-audio: check-env ## Add demo audiobooks and music (LibriVox, Musopen, Đen link-outs)
+	$(LOAD) cd $(API_DIR) && go run ./cmd/import-audio seed
+
+seed-audio-remove: check-env ## Delete the demo audiobooks and music
+	$(LOAD) cd $(API_DIR) && go run ./cmd/import-audio seed -remove
+
 seed-remove: check-env ## Delete the demo films added by make seed
 	$(LOAD) cd $(API_DIR) && go run ./cmd/seed -remove
 
@@ -76,7 +108,7 @@ test: ## Go unit + encoder tests
 	cd $(API_DIR) && go vet ./... && go test ./...
 
 test-db: ## Go tests including DB/auth tests against local Postgres
-	cd $(API_DIR) && TEST_DATABASE_URL="$(LOCAL_DB)" go test -count=1 ./...
+	cd $(API_DIR) && TEST_DATABASE_URL="$(LOCAL_DB)" go test -count=1 -p 1 ./...
 
 typecheck: ## TypeScript check for the web app
 	cd $(WEB_DIR) && npx tsc --noEmit

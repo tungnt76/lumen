@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { MyListGrid } from "@/components/Local";
+import { SavedWorksGrid } from "@/components/WorkControls";
 
 export const metadata: Metadata = { title: "My list" };
 
@@ -10,7 +11,10 @@ export default function MyListPage() {
         <h1 style={{ fontSize: "clamp(34px, 4vw, 48px)" }}>My list</h1>
         <p className="muted" style={{ margin: 0 }}>Saved in this browser only. No account, nothing sent to us.</p>
       </div>
+      <h2 style={{ fontSize: 22 }}>Films</h2>
       <MyListGrid />
+      <h2 style={{ fontSize: 22, marginTop: 16 }}>Books and music</h2>
+      <SavedWorksGrid />
     </div>
   );
 }

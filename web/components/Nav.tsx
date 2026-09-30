@@ -2,22 +2,33 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { BookmarkIcon, HomeIcon, SearchIcon } from "./icons";
+import { LogoMark } from "./Logo";
+import { ThemeToggle } from "./ThemeToggle";
+import { AccountMenu } from "./AccountMenu";
+import { BookIcon, BookmarkIcon, CodeIcon, FilmIcon, HomeIcon, MusicIcon, PenIcon, SearchIcon } from "./icons";
 
 const links = [
-  { href: "/", label: "Home" },
-  { href: "/browse", label: "Movies" },
-  { href: "/my-list", label: "My list" },
+  { href: "/", label: "Home", icon: HomeIcon },
+  { href: "/browse", label: "Movies", icon: FilmIcon },
+  { href: "/books", label: "Books", icon: BookIcon },
+  { href: "/music", label: "Music", icon: MusicIcon },
+  { href: "/my-list", label: "My list", icon: BookmarkIcon },
+  { href: "/draw", label: "Excalidraw", icon: PenIcon },
+  { href: "/code", label: "Code", icon: CodeIcon },
 ];
+
+// Book and album pages belong to their tab; film pages to Movies.
+const sections: [string, string][] = [["/movie/", "/browse"]];
 
 export function Nav() {
   const path = usePathname();
-  const current = (href: string) => (href === "/" ? path === "/" : path.startsWith(href));
+  const current = (href: string) =>
+    href === "/" ? path === "/" : path.startsWith(href) || sections.some(([p, h]) => h === href && path.startsWith(p));
   return (
     <>
       <header className="nav">
         <Link href="/" className="logo" aria-label="Lumen home">
-          <span className="logo-mark" />
+          <LogoMark size={30} />
           <span className="logo-word">Lumen</span>
         </Link>
         <nav aria-label="Main" className="nav-links">
@@ -27,14 +38,18 @@ export function Nav() {
             </Link>
           ))}
         </nav>
-        <Link href="/browse?focus=1" className="icon-btn" aria-label="Search" style={{ marginLeft: "auto" }}>
-          <SearchIcon />
-        </Link>
+        <div className="nav-tools">
+          <ThemeToggle />
+          <Link href="/browse?focus=1" className="icon-btn" aria-label="Search films">
+            <SearchIcon />
+          </Link>
+          <AccountMenu />
+        </div>
       </header>
       <nav aria-label="Tabs" className="tabbar">
-        <Link href="/" aria-current={current("/") ? "page" : undefined}><HomeIcon size={22} />Home</Link>
-        <Link href="/browse" aria-current={current("/browse") ? "page" : undefined}><SearchIcon size={22} />Browse</Link>
-        <Link href="/my-list" aria-current={current("/my-list") ? "page" : undefined}><BookmarkIcon size={22} />My list</Link>
+        {links.map(({ href, label, icon: Icon }) => (
+          <Link key={href} href={href} aria-current={current(href) ? "page" : undefined}><Icon size={22} />{label}</Link>
+        ))}
       </nav>
     </>
   );
@@ -44,13 +59,20 @@ export function Footer() {
   return (
     <footer className="footer">
       <div>
-        <p>Every film on Lumen is in the public domain or published with the rights holder&apos;s permission.</p>
+        <p>Every film, book and song hosted on Lumen is in the public domain, openly licensed, or published with the rights holder&apos;s permission. Music by current artists links to their official channels.</p>
         <p>This product uses the TMDB API but is not endorsed or certified by TMDB. Where-to-watch data by JustWatch.</p>
+        <p>
+          Audiobooks from <a href="https://librivox.org/" target="_blank" rel="noopener noreferrer">LibriVox</a> and texts from Wikisource; music
+          from <a href="https://musopen.org/" target="_blank" rel="noopener noreferrer">Musopen</a> via the Internet Archive; release data from
+          MusicBrainz, covers from the Cover Art Archive and composer portraits from Wikimedia Commons. AI voices use Piper with the VAIS-1000 corpus (CC BY 4.0).
+        </p>
       </div>
-      <a href="https://www.themoviedb.org/" target="_blank" rel="noopener noreferrer" className="chip" style={{ alignSelf: "center", textDecoration: "none" }}>
-        {/* TODO before launch: replace with an approved logo from themoviedb.org/about/logos-attribution */}
-        Powered by TMDB
-      </a>
+      <div className="footer-side">
+        <a href="https://www.themoviedb.org/" target="_blank" rel="noopener noreferrer" className="chip" style={{ textDecoration: "none" }}>
+          {/* TODO before launch: replace with an approved logo from themoviedb.org/about/logos-attribution */}
+          Powered by TMDB
+        </a>
+      </div>
     </footer>
   );
 }

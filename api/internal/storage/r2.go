@@ -63,6 +63,33 @@ func (r *R2) PresignPut(ctx context.Context, key, contentType string, ttl time.D
 	return req.URL, nil
 }
 
+// PresignGet returns a temporary download URL, for objects in a private bucket.
+func (r *R2) PresignGet(ctx context.Context, key string, ttl time.Duration) (string, error) {
+	req, err := r.presign.PresignGetObject(ctx, &s3.GetObjectInput{Bucket: aws.String(r.bucket), Key: aws.String(key)}, s3.WithPresignExpires(ttl))
+	if err != nil {
+		return "", err
+	}
+	return req.URL, nil
+}
+
+// Size returns an object's size in bytes, and false if it doesn't exist.
+func (r *R2) Size(ctx context.Context, key string) (int64, bool, error) {
+	out, err := r.client.HeadObject(ctx, &s3.HeadObjectInput{Bucket: aws.String(r.bucket), Key: aws.String(key)})
+	if err != nil {
+		var re *awshttp.ResponseError
+		if errors.As(err, &re) && re.HTTPStatusCode() == 404 {
+			return 0, false, nil
+		}
+		return 0, false, err
+	}
+	return aws.ToInt64(out.ContentLength), true, nil
+}
+
+// Drawings live in the media bucket under drawings/, one folder per drawing. The folder name
+// carries a random token (see store.Drawing.Folder) because the media bucket is public.
+func DrawingSceneKey(folder string) string   { return folder + "scene.excalidraw" }
+func DrawingPreviewKey(folder string) string { return folder + "preview.png" }
+
 // Exists reports whether an object exists.
 func (r *R2) Exists(ctx context.Context, key string) (bool, error) {
 	_, err := r.client.HeadObject(ctx, &s3.HeadObjectInput{Bucket: aws.String(r.bucket), Key: aws.String(key)})
@@ -102,6 +129,8 @@ func contentType(name string) string {
 		return "video/mp2t"
 	case ".vtt":
 		return "text/vtt"
+	case ".m4a":
+		return "audio/mp4" // the OS mime table varies (audio/x-m4a, or missing)
 	}
 	if t := mime.TypeByExtension(filepath.Ext(name)); t != "" {
 		return t
@@ -133,6 +162,71 @@ func (r *R2) UploadDir(ctx context.Context, dir, prefix string) error {
 		})
 		return err
 	})
+}
+
+// CORS returns the bucket's CORS rules as "origins → methods" lines (none if unset).
+func (r *R2) CORS(ctx context.Context) ([]string, error) {
+	out, err := r.client.GetBucketCors(ctx, &s3.GetBucketCorsInput{Bucket: aws.String(r.bucket)})
+	if err != nil {
+		if strings.Contains(err.Error(), "NoSuchCORSConfiguration") {
+			return nil, nil
+		}
+		return nil, err
+	}
+	var lines []string
+	for _, rule := range out.CORSRules {
+		lines = append(lines, strings.Join(rule.AllowedOrigins, ", ")+" → "+strings.Join(rule.AllowedMethods, ", "))
+	}
+	return lines, nil
+}
+
+// SetCORS lets browsers on these origins upload (presigned PUT) and read (GET, HEAD with Range
+// for audio and video seeking). It replaces any existing rules.
+func (r *R2) SetCORS(ctx context.Context, origins []string) error {
+	_, err := r.client.PutBucketCors(ctx, &s3.PutBucketCorsInput{
+		Bucket: aws.String(r.bucket),
+		CORSConfiguration: &types.CORSConfiguration{CORSRules: []types.CORSRule{{
+			AllowedOrigins: origins,
+			AllowedMethods: []string{"GET", "HEAD", "PUT"},
+			AllowedHeaders: []string{"Content-Type", "Range"},
+			ExposeHeaders:  []string{"ETag", "Content-Length", "Content-Range"},
+			MaxAgeSeconds:  aws.Int32(3600),
+		}}},
+	})
+	return err
+}
+
+// Get reads a whole (small) object into memory, refusing anything over max bytes.
+func (r *R2) Get(ctx context.Context, key string, max int64) ([]byte, error) {
+	out, err := r.client.GetObject(ctx, &s3.GetObjectInput{Bucket: aws.String(r.bucket), Key: aws.String(key)})
+	if err != nil {
+		return nil, err
+	}
+	defer out.Body.Close()
+	b, err := io.ReadAll(io.LimitReader(out.Body, max+1))
+	if err != nil {
+		return nil, err
+	}
+	if int64(len(b)) > max {
+		return nil, fmt.Errorf("%s is over %d bytes", key, max)
+	}
+	return b, nil
+}
+
+// Copy duplicates an object inside the bucket (no download), e.g. a code commit snapshot.
+func (r *R2) Copy(ctx context.Context, from, to string) error {
+	_, err := r.client.CopyObject(ctx, &s3.CopyObjectInput{
+		Bucket:     aws.String(r.bucket),
+		CopySource: aws.String(r.bucket + "/" + from),
+		Key:        aws.String(to),
+	})
+	return err
+}
+
+// Delete removes one object.
+func (r *R2) Delete(ctx context.Context, key string) error {
+	_, err := r.client.DeleteObject(ctx, &s3.DeleteObjectInput{Bucket: aws.String(r.bucket), Key: aws.String(key)})
+	return err
 }
 
 // DeletePrefix removes every object under prefix.

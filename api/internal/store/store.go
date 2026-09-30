@@ -35,7 +35,14 @@ func Open(ctx context.Context, url string) (*Store, error) {
 	if _, err := db.Exec(ctx, schema); err != nil {
 		return nil, err
 	}
-	return &Store{db: db}, nil
+	st := &Store{db: db}
+	if err := st.migrate(ctx); err != nil {
+		return nil, err
+	}
+	if err := st.backfillSearch(ctx); err != nil {
+		return nil, err
+	}
+	return st, nil
 }
 
 func (s *Store) Close() { s.db.Close() }
@@ -114,6 +121,13 @@ func (s *Store) CreateFilm(ctx context.Context, f Film) (*Film, error) {
 
 func (s *Store) GetFilm(ctx context.Context, id int64) (*Film, error) {
 	return scanFilm(s.db.QueryRow(ctx, `SELECT `+filmCols+` FROM films WHERE id=$1`, id))
+}
+
+// FilmExists reports whether a film with this TMDB id is in the library, in any state.
+func (s *Store) FilmExists(ctx context.Context, tmdbID int) (bool, error) {
+	var ok bool
+	err := s.db.QueryRow(ctx, `SELECT EXISTS (SELECT 1 FROM films WHERE tmdb_id=$1)`, tmdbID).Scan(&ok)
+	return ok, err
 }
 
 // PublishedByTMDB returns a playable film for a TMDB id.

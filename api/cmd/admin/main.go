@@ -1,4 +1,4 @@
-// Command admin creates (or resets) a studio admin account.
+// Command admin creates (or resets) an admin account (a user with the admin role).
 // Run it from your own machine, never expose it over HTTP.
 //
 //	DATABASE_URL=... go run ./cmd/admin -email you@example.com
@@ -33,13 +33,7 @@ func main() {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
-	// Sign-in no longer asks for an authenticator code; the column still needs a value.
-	secret, err := auth.NewTOTPSecret()
-	if err != nil {
-		fmt.Fprintln(os.Stderr, err)
-		os.Exit(1)
-	}
-
+	name := strings.Split(strings.ToLower(*email), "@")[0]
 	ctx := context.Background()
 	st, err := store.Open(ctx, dbURL)
 	if err != nil {
@@ -47,11 +41,11 @@ func main() {
 		os.Exit(1)
 	}
 	defer st.Close()
-	if err := st.UpsertAdmin(ctx, *email, hash, secret); err != nil {
+	if _, err := st.UpsertUser(ctx, *email, hash, name, store.RoleAdmin, "film"); err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
 
-	fmt.Printf("\nAdmin %s saved. Sign in at /studio with this email and password.\n", strings.ToLower(*email))
+	fmt.Printf("\nAdmin %s saved. Sign in at /login (or /studio) with this email and password.\n", strings.ToLower(*email))
 	fmt.Println("Re-run this command to reset the password.")
 }

@@ -74,3 +74,60 @@ export function saveProgress(p: Omit<Progress, "updatedAt">) {
   }
   write(PROGRESS_KEY, all.slice(0, 30));
 }
+
+// ---- audiobooks and music: saved works and listening position ----
+
+export type SavedWork = { id: string; kind: "book" | "album"; title: string; creator: string; cover: string };
+
+// Entries saved before ids became UUIDs (numbers) point at pages that no longer exist.
+const isCurrent = (w: { id: unknown }) => typeof w.id === "string" && /^[0-9a-f-]{36}$/.test(w.id);
+
+/** Where the listener stopped: the track index within the work and the position in that track. */
+export type Listening = SavedWork & { track: number; trackCount: number; position: number; duration: number; updatedAt: number };
+
+const WORKS_KEY = "lumen:works";
+const LISTENING_KEY = "lumen:listening";
+const RATE_KEY = "lumen:rate";
+
+export function getWorkList(): SavedWork[] {
+  return read<SavedWork[]>(WORKS_KEY, []).filter(isCurrent);
+}
+
+export function inWorkList(id: string) {
+  return getWorkList().some((w) => w.id === id);
+}
+
+export function toggleWorkList(work: SavedWork) {
+  const list = getWorkList();
+  const next = list.some((w) => w.id === work.id)
+    ? list.filter((w) => w.id !== work.id)
+    : [work, ...list].slice(0, 200);
+  write(WORKS_KEY, next);
+}
+
+export function getListening(): Listening[] {
+  return read<Listening[]>(LISTENING_KEY, []).filter(isCurrent).sort((a, b) => b.updatedAt - a.updatedAt);
+}
+
+export function listeningFor(id: string) {
+  return getListening().find((l) => l.id === id);
+}
+
+export function saveListening(l: Omit<Listening, "updatedAt">) {
+  let all = getListening().filter((x) => x.id !== l.id);
+  // Finished the last track: drop it from "Continue listening".
+  const done = l.track >= l.trackCount - 1 && l.duration > 0 && l.position / l.duration >= 0.98;
+  if (!done && (l.track > 0 || l.position > 10)) {
+    all = [{ ...l, updatedAt: Date.now() }, ...all];
+  }
+  write(LISTENING_KEY, all.slice(0, 30));
+}
+
+export function getRate(): number {
+  const r = read<number>(RATE_KEY, 1);
+  return typeof r === "number" && r >= 0.5 && r <= 3 ? r : 1;
+}
+
+export function saveRate(rate: number) {
+  write(RATE_KEY, rate);
+}
